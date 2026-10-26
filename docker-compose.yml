@@ -1,0 +1,42 @@
+services:
+  authvault-db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    image: authvault-db:latest
+    container_name: authvault_postgres
+    environment:
+      POSTGRES_DB: authvault
+      POSTGRES_USER: vault_user
+      POSTGRES_PASSWORD: vault_secure_password_2026
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  authvault-backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: authvault-backend:latest
+    container_name: authvault_backend_api
+    depends_on:
+      authvault-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      JWT_SECRET: enterprise_super_secure_vault_jwt_secret_key_2026!
+      DB_HOST: authvault-db
+      DB_PORT: 5432
+      DB_USER: vault_user
+      DB_PASSWORD: vault_secure_password_2026
+      DB_NAME: authvault
+      DB_SSLMODE: disable
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
