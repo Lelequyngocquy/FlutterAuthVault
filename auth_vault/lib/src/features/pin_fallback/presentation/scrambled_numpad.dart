@@ -96,11 +96,11 @@ class _ScrambledNumpadState extends State<ScrambledNumpad> {
               itemCount: 12,
               itemBuilder: (context, index) {
                 if (index == 9) {
-                  return _buildActionButton('CLR', _onClearPressed);
+                  return _buildActionButton('XÓA', Icons.refresh, _onClearPressed);
                 } else if (index == 10) {
                   return _buildDigitButton(_digits[9]);
                 } else if (index == 11) {
-                  return _buildActionButton('DEL', _onBackspacePressed);
+                  return _buildActionButton('LÙI', Icons.backspace_outlined, _onBackspacePressed);
                 }
                 return _buildDigitButton(_digits[index]);
               },
@@ -133,20 +133,27 @@ class _ScrambledNumpadState extends State<ScrambledNumpad> {
       ),
     );
   }
-  Widget _buildActionButton(String label, VoidCallback onTap) {
+  Widget _buildActionButton(String label, IconData icon, VoidCallback onPressed) {
     return Material(
-      color: Colors.transparent,
+      color: UIColors.canvas,
       borderRadius: BorderRadius.circular(Dimen.radiusSm),
       child: InkWell(
-        onTap: onTap,
+        onTap: onPressed,
         borderRadius: BorderRadius.circular(Dimen.radiusSm),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Dimen.radiusSm),
-            border: Border.all(color: UIColors.hairline.withValues(alpha: 0.5), width: 1),
+            border: Border.all(color: UIColors.hairline, width: 1),
           ),
           alignment: Alignment.center,
-          child: AppText.mono(label, fontSize: 13, color: UIColors.mute),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 14, color: UIColors.mute),
+              const SizedBox(width: 4),
+              AppText.mono(label, fontSize: 11, fontWeight: FontWeight.w600, color: UIColors.mute),
+            ],
+          ),
         ),
       ),
     );

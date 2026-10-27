@@ -38,7 +38,7 @@ class RestfulRequest {
         return handler.next(response);
       },
       onError: (DioException error, handler) async {
-        debugPrint('[HTTP ERR] ${error.requestOptions.path} -> ${error.response?.statusCode}');
+        debugPrint('[HTTP ERR] ${error.requestOptions.path} -> ${error.response?.statusCode} (${error.type}: ${error.message})');
         if (error.response?.statusCode == 401) {
           final currentToken = await SecuredStorage.instance.accessToken;
           final reqAuth = error.requestOptions.headers['Authorization']?.toString();

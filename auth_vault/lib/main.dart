@@ -6,7 +6,7 @@ import 'src/core/infrastructure/datasources/local_storage.dart';
 import 'src/core/infrastructure/security/app_lifecycle_privacy_observer.dart';
 import 'src/core/infrastructure/security/biometric_crypto_service.dart';
 import 'src/core/infrastructure/security/session_timeout_manager.dart';
-import 'src/features/auth/infrastructure/auth_repository.dart';
+import 'src/features/auth/infrastructure/repository/auth_repository.dart';
 import 'src/features/auth/presentation/cubits/auth_cubit.dart';
 import 'src/features/dashboard/infrastructure/dashboard_repository.dart';
 import 'src/features/dashboard/presentation/cubits/dashboard_cubit.dart';
@@ -35,31 +35,32 @@ class VaultPassApp extends StatelessWidget {
       ],
       child: Builder(
         builder: (ctx) {
-          return SessionTimeoutManager(
-            timeoutDuration: const Duration(seconds: 120),
-            onTimeout: () {
-              ctx.read<AuthCubit>().logout();
-              GlobalKeyManager.instance.root.currentState?.pushNamedAndRemoveUntil(
-                RouterPath.login,
-                (route) => false,
-              );
-            },
-            child: PrivacyCurtainContainer(
-              child: MaterialApp.router(
-                title: 'AuthVault',
-                debugShowCheckedModeBanner: false,
-                theme: ThemeData(
-                  scaffoldBackgroundColor: UIColors.canvas,
-                  brightness: Brightness.dark,
-                  primaryColor: UIColors.primary,
-                  colorScheme: const ColorScheme.dark(
-                    primary: UIColors.primary,
-                    surface: UIColors.canvasSoft,
-                  ),
-                ),
-                routerConfig: AppRouter.instance.router,
+          return MaterialApp.router(
+            title: 'AuthVault',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              scaffoldBackgroundColor: UIColors.canvas,
+              brightness: Brightness.dark,
+              primaryColor: UIColors.primary,
+              colorScheme: const ColorScheme.dark(
+                primary: UIColors.primary,
+                surface: UIColors.canvasSoft,
               ),
             ),
+            routerConfig: AppRouter.instance.router,
+            builder: (context, child) {
+              return SessionTimeoutManager(
+                timeoutDuration: const Duration(seconds: 120),
+                onTimeout: () {
+                  ctx.read<AuthCubit>().logout();
+                  AppRouter.instance.router.go(RouterPath.login);
+                },
+                child: PrivacyCurtainContainer(
+                  key: PrivacyCurtainContainer.globalKey,
+                  child: child ?? const SizedBox.shrink(),
+                ),
+              );
+            },
           );
         },
       ),

@@ -7,12 +7,14 @@ import 'package:vault_pass_mobile/src/core/domain/bloc_status.dart';
 import 'package:vault_pass_mobile/src/core/infrastructure/datasources/local_storage.dart';
 import 'package:vault_pass_mobile/src/core/infrastructure/security/biometric_crypto_service.dart';
 import 'package:vault_pass_mobile/src/features/auth/domain/user_entity.dart';
-import 'package:vault_pass_mobile/src/features/auth/infrastructure/auth_repository.dart';
+import 'package:vault_pass_mobile/src/features/auth/infrastructure/repository/auth_repository.dart';
 import 'package:vault_pass_mobile/src/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:vault_pass_mobile/src/features/auth/presentation/cubits/auth_state.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
-class MockBiometricCryptoService extends Mock implements BiometricCryptoService {}
+
+class MockBiometricCryptoService extends Mock
+    implements BiometricCryptoService {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -41,29 +43,29 @@ void main() {
       'togglePinFallback updates mode correctly',
       build: () => AuthCubit(mockRepo, mockBio),
       act: (cubit) => cubit.togglePinFallback(true),
-      expect: () => [
-        const AuthState(isPinFallbackMode: true),
-      ],
+      expect: () => [const AuthState(isPinFallbackMode: true)],
     );
     blocTest<AuthCubit, AuthState>(
       'checkBiometricSupport emits state with availability flag',
       build: () {
-        when(() => mockBio.isBiometricAvailable()).thenAnswer((_) async => true);
+        when(
+          () => mockBio.isBiometricAvailable(),
+        ).thenAnswer((_) async => true);
         return AuthCubit(mockRepo, mockBio);
       },
       act: (cubit) => cubit.checkBiometricSupport(),
-      expect: () => [
-        const AuthState(isBiometricAvailable: true),
-      ],
+      expect: () => [const AuthState(isBiometricAvailable: true)],
     );
     blocTest<AuthCubit, AuthState>(
       'loginWithPassword emits loading then success on valid credentials',
       build: () {
-        when(() => mockRepo.login(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-          deviceId: any(named: 'deviceId'),
-        )).thenAnswer((_) async => BaseResult.ok(testUser));
+        when(
+          () => mockRepo.login(
+            username: any(named: 'username'),
+            password: any(named: 'password'),
+            deviceId: any(named: 'deviceId'),
+          ),
+        ).thenAnswer((_) async => BaseResult.ok(testUser));
         return AuthCubit(mockRepo, mockBio);
       },
       act: (cubit) => cubit.loginWithPassword('admin', 'admin123'),
@@ -75,17 +77,35 @@ void main() {
     blocTest<AuthCubit, AuthState>(
       'loginWithPassword emits loading then error on invalid credentials',
       build: () {
-        when(() => mockRepo.login(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-          deviceId: any(named: 'deviceId'),
-        )).thenAnswer((_) async => BaseResult.err('Invalid credentials'));
+        when(
+          () => mockRepo.login(
+            username: any(named: 'username'),
+            password: any(named: 'password'),
+            deviceId: any(named: 'deviceId'),
+          ),
+        ).thenAnswer((_) async => BaseResult.err('Invalid credentials'));
         return AuthCubit(mockRepo, mockBio);
       },
       act: (cubit) => cubit.loginWithPassword('admin', 'wrong_pass'),
       expect: () => [
         const AuthState(status: BlocStatus.loading),
-        const AuthState(status: BlocStatus.error, message: 'Invalid credentials'),
+        const AuthState(
+          status: BlocStatus.error,
+          message: 'Invalid credentials',
+        ),
+      ],
+    );
+    blocTest<AuthCubit, AuthState>(
+      'loginWithBiometrics emits error when biometric authentication is canceled',
+      build: () {
+        when(() => mockRepo.getBiometricChallenge(any())).thenAnswer((_) async => 'nonce_test');
+        when(() => mockBio.authenticateBiometrics(reason: any(named: 'reason'))).thenAnswer((_) async => const BiometricAuthResult.failure('Biometric scan canceled by user'));
+        return AuthCubit(mockRepo, mockBio);
+      },
+      act: (cubit) => cubit.loginWithBiometrics(),
+      expect: () => [
+        const AuthState(status: BlocStatus.loading),
+        const AuthState(status: BlocStatus.error, message: 'Biometric scan canceled by user'),
       ],
     );
   });

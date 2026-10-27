@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/domain/bloc_status.dart';
 import '../../../../core/infrastructure/datasources/local_storage.dart';
 import '../../../../core/infrastructure/security/biometric_crypto_service.dart';
-import '../../infrastructure/auth_repository.dart';
+import '../../infrastructure/repository/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -52,9 +52,11 @@ class AuthCubit extends Cubit<AuthState> {
       emit(state.copyWith(status: BlocStatus.error, message: 'Failed to issue challenge'));
       return;
     }
-    final authenticated = await _bio.authenticateBiometrics(reason: 'Verify biometric identity for Vault Access');
-    if (!authenticated) {
-      emit(state.copyWith(status: BlocStatus.error, message: 'Biometric scan canceled or failed'));
+    final bioResult = await _bio.authenticateBiometrics(
+      reason: 'Verify biometric identity for Vault Access',
+    );
+    if (!bioResult.success) {
+      emit(state.copyWith(status: BlocStatus.error, message: bioResult.errorMessage ?? 'Biometric verification failed'));
       return;
     }
     final signature = _bio.signChallenge(nonce, devId);

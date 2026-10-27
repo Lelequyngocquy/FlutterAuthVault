@@ -10,12 +10,12 @@ void main() {
       ),
     ));
     expect(find.text('Confidential Banking Data'), findsOneWidget);
-    expect(find.text('[PRIVACY CURTAIN ACTIVE]'), findsNothing);
+    expect(find.text('[RÈM BẢO MẬT ĐANG BẬT]'), findsNothing);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
     await tester.pump();
-    expect(find.text('[PRIVACY CURTAIN ACTIVE]'), findsOneWidget);
+    expect(find.text('[RÈM BẢO MẬT ĐANG BẬT]'), findsOneWidget);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pump();
-    expect(find.text('[PRIVACY CURTAIN ACTIVE]'), findsNothing);
+    expect(find.text('[RÈM BẢO MẬT ĐANG BẬT]'), findsNothing);
   });
 }

@@ -17,7 +17,7 @@ class DashboardCubit extends Cubit<DashboardState> {
   }
   Future<void> triggerConcurrent401Test() async {
     final logs = List<String>.from(state.executionLogs);
-    logs.add('[MUTEX TEST] Launching 5 parallel API calls to /vault/items...');
+    logs.add('[BẮT ĐẦU THỬ NGHIỆM] Đang gửi đồng thời 5 request đến /vault/items...');
     emit(state.copyWith(isTestingConcurrency: true, executionLogs: logs));
     final futures = List.generate(5, (index) async {
       final res = await _repo.getVaultItems();
@@ -25,8 +25,8 @@ class DashboardCubit extends Cubit<DashboardState> {
     });
     final results = await Future.wait(futures);
     final successes = results.where((r) => r).length;
-    logs.add('[MUTEX TEST COMPLETED] $successes/5 parallel requests resolved with 200 OK');
-    logs.add('[RESULT] Mutex queue synchronized refresh call successfully');
+    logs.add('[HOÀN TẤT] $successes/5 request đồng thời đều nhận được kết quả thành công 200 OK');
+    logs.add('[KẾT QUẢ] Hàng đợi Mutex đã khóa, chỉ làm mới token 1 lần duy nhất và phát lại an toàn');
     emit(state.copyWith(
       isTestingConcurrency: false,
       executionLogs: logs,

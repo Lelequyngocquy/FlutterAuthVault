@@ -7,11 +7,13 @@ class StatusPill extends StatelessWidget {
   final String label;
   final Color color;
   final bool fill;
+  final int maxLines;
   const StatusPill({
     super.key,
     required this.label,
     this.color = UIColors.primary,
     this.fill = false,
+    this.maxLines = 2,
   });
   @override
   Widget build(BuildContext context) {
@@ -25,8 +27,9 @@ class StatusPill extends StatelessWidget {
       child: AppText.mono(
         label.toUpperCase(),
         color: color,
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: FontWeight.w600,
+        maxLines: maxLines,
       ),
     );
   }

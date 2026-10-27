@@ -12,7 +12,7 @@ class AppText extends StatelessWidget {
     required this.text,
     required this.style,
     this.textAlign,
-    this.maxLines,
+    this.maxLines = 3,
     this.overflow = TextOverflow.ellipsis,
   });
   factory AppText.regular(
@@ -20,7 +20,7 @@ class AppText extends StatelessWidget {
     Key? key,
     double fontSize = 14,
     Color? color,
-    int? maxLines,
+    int? maxLines = 3,
     TextAlign? textAlign,
     TextOverflow? overflow = TextOverflow.ellipsis,
   }) {
@@ -42,7 +42,7 @@ class AppText extends StatelessWidget {
     Key? key,
     double fontSize = 15,
     Color? color,
-    int? maxLines,
+    int? maxLines = 3,
     TextAlign? textAlign,
     TextOverflow? overflow = TextOverflow.ellipsis,
   }) {
@@ -64,7 +64,7 @@ class AppText extends StatelessWidget {
     Key? key,
     double fontSize = 18,
     Color? color,
-    int? maxLines,
+    int? maxLines = 3,
     TextAlign? textAlign,
     TextOverflow? overflow = TextOverflow.ellipsis,
   }) {
@@ -87,7 +87,7 @@ class AppText extends StatelessWidget {
     double fontSize = 13,
     Color? color,
     FontWeight fontWeight = FontWeight.w400,
-    int? maxLines,
+    int? maxLines = 3,
     TextAlign? textAlign,
     TextOverflow? overflow = TextOverflow.ellipsis,
   }) {
@@ -111,10 +111,14 @@ class AppText extends StatelessWidget {
     Key? key,
     double fontSize = 12,
     Color? color,
+    int? maxLines = 2,
+    TextOverflow? overflow = TextOverflow.ellipsis,
   }) {
     return AppText._(
       key: key,
       text: text.toUpperCase(),
+      maxLines: maxLines,
+      overflow: overflow,
       style: TextStyle(
         color: color ?? UIColors.mute,
         fontSize: fontSize,
